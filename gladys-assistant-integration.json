@@ -1,0 +1,919 @@
+{
+  "manifest_version": 1,
+  "type": "device",
+  "name": "Aircraft overhead",
+  "description": {
+    "en": "Unofficial connector: aircraft flying over your home, closest flight, altitude and heading.",
+    "fr": "Connecteur non officiel : les avions au-dessus de chez vous, vol le plus proche, altitude, cap."
+  },
+  "version": "0.1.0",
+  "docker_image": "ghcr.io/lm1lc3n7/gladys-aircraft:0.1.0",
+  "gladys_version": ">=5.1.0",
+  "cover_image": "https://raw.githubusercontent.com/LM1LC3N7/gladys-aircraft/main/cover.png",
+  "categories": ["environment"],
+  "transports": ["cloud"],
+  "location": true,
+  "config_schema": [
+    {
+      "key": "intro",
+      "type": "section",
+      "label": {
+        "en": "Aircraft over your house",
+        "fr": "Les avions au-dessus de chez vous"
+      },
+      "description": {
+        "en": "Unofficial connector, not affiliated with adsb.lol, adsb.fi or the OpenSky Network. One device per located house: the aircraft within the radius, the distance, altitude and flight of the closest one; an \"aircraft overhead\" scene trigger (within a distance, below an altitude, once per passage), an \"emergency squawk\" trigger, a scene action and a sky widget. The aircraft come from the source chosen below: adsb.lol by default (free, open data: Data: adsb.lol, ODbL 1.0), adsb.fi (personal, non-commercial use only: Data: adsb.fi, https://adsb.fi), your own ADS-B receiver on your network, or the OpenSky Network (only with OpenSky's written agreement). With adsb.lol and adsb.fi, only the position of the house rounded to about a kilometre leaves Gladys; with your receiver, nothing leaves your network.",
+        "fr": "Connecteur non officiel, sans lien avec adsb.lol, adsb.fi ou l'OpenSky Network. Un appareil par maison localisée : les avions dans le rayon, la distance, l'altitude et le vol du plus proche ; un déclencheur de scène « avion au-dessus » (à moins d'une distance, sous une altitude, une fois par passage), un déclencheur « code d'urgence », une action de scène et un widget ciel. Les avions viennent de la source choisie ci-dessous : adsb.lol par défaut (gratuit, données ouvertes : Données : adsb.lol, ODbL 1.0), adsb.fi (usage personnel et non commercial seulement : Données : adsb.fi, https://adsb.fi), votre propre récepteur ADS-B sur votre réseau, ou l'OpenSky Network (seulement avec l'accord écrit d'OpenSky). Avec adsb.lol et adsb.fi, seule la position de la maison arrondie à un kilomètre environ quitte Gladys ; avec votre récepteur, rien ne quitte votre réseau."
+      },
+      "links": [
+        {
+          "url": "https://adsb.lol/",
+          "label": {
+            "en": "adsb.lol (the default source, ODbL 1.0)",
+            "fr": "adsb.lol (la source par défaut, ODbL 1.0)"
+          }
+        },
+        {
+          "url": "https://adsb.fi/",
+          "label": {
+            "en": "adsb.fi (personal, non-commercial use)",
+            "fr": "adsb.fi (usage personnel, non commercial)"
+          }
+        },
+        {
+          "url": "https://github.com/LM1LC3N7/gladys-aircraft/blob/main/docs/fr.md",
+          "label": {
+            "en": "Guide (French)",
+            "fr": "Guide (français)"
+          }
+        },
+        {
+          "url": "https://github.com/LM1LC3N7/gladys-aircraft/blob/main/docs/en.md",
+          "label": {
+            "en": "Guide (English)",
+            "fr": "Guide (anglais)"
+          }
+        }
+      ]
+    },
+    {
+      "key": "source",
+      "type": "select",
+      "label": {
+        "en": "Source of the aircraft",
+        "fr": "Source des avions"
+      },
+      "description": {
+        "en": "adsb.lol: free, no account, open data (ODbL 1.0), a reading every 30 s. adsb.fi: personal, non-commercial use only, a reading every 30 s. Your receiver: the aircraft.json of readsb, dump1090-fa or tar1090 on your network, a reading every 10 s. OpenSky: its terms require a written agreement for any use in an automated system such as Gladys; choose it only if OpenSky granted you one.",
+        "fr": "adsb.lol : gratuit, sans compte, données ouvertes (ODbL 1.0), une lecture toutes les 30 s. adsb.fi : usage personnel et non commercial seulement, une lecture toutes les 30 s. Votre récepteur : l'aircraft.json de readsb, dump1090-fa ou tar1090 sur votre réseau, une lecture toutes les 10 s. OpenSky : ses conditions exigent un accord écrit pour tout usage dans un système automatisé comme Gladys ; ne le choisissez que si OpenSky vous l'a accordé."
+      },
+      "required": false,
+      "default": "adsblol",
+      "options": [
+        {
+          "value": "adsblol",
+          "label": {
+            "en": "adsb.lol (recommended)",
+            "fr": "adsb.lol (recommandé)"
+          }
+        },
+        {
+          "value": "adsbfi",
+          "label": {
+            "en": "adsb.fi (personal, non-commercial use)",
+            "fr": "adsb.fi (usage personnel, non commercial)"
+          }
+        },
+        {
+          "value": "receiver",
+          "label": {
+            "en": "My ADS-B receiver (readsb, dump1090, tar1090)",
+            "fr": "Mon récepteur ADS-B (readsb, dump1090, tar1090)"
+          }
+        },
+        {
+          "value": "opensky",
+          "label": {
+            "en": "OpenSky Network (written agreement required)",
+            "fr": "OpenSky Network (accord écrit requis)"
+          }
+        }
+      ]
+    },
+    {
+      "key": "radius_km",
+      "type": "number",
+      "label": {
+        "en": "Radius around the house (km)",
+        "fr": "Rayon autour de la maison (km)"
+      },
+      "description": {
+        "en": "Only the aircraft closer than this count.",
+        "fr": "Seuls les avions plus proches comptent."
+      },
+      "required": false,
+      "default": 10,
+      "min": 1,
+      "max": 25
+    },
+    {
+      "key": "ignore_ground",
+      "type": "boolean",
+      "label": {
+        "en": "Ignore the aircraft on the ground",
+        "fr": "Ignorer les avions au sol"
+      },
+      "description": {
+        "en": "The aircraft taxiing or parked at a nearby airport, and its ground vehicles.",
+        "fr": "Les avions qui roulent ou stationnent sur un aéroport proche, et ses véhicules."
+      },
+      "required": false,
+      "default": true
+    },
+    {
+      "key": "altitude",
+      "type": "select",
+      "label": {
+        "en": "Altitude",
+        "fr": "Altitude"
+      },
+      "description": {
+        "en": "Geometric (satellite positioning, closer to the real height above sea level) or barometric (the pressure altitude pilots fly by). The other one is used when the chosen one is missing.",
+        "fr": "Géométrique (positionnement satellite, plus proche de la hauteur réelle au-dessus de la mer) ou barométrique (l'altitude pression des pilotes). L'autre sert quand celle choisie manque."
+      },
+      "required": false,
+      "default": "geometric",
+      "options": [
+        {
+          "value": "geometric",
+          "label": {
+            "en": "Geometric",
+            "fr": "Géométrique"
+          }
+        },
+        {
+          "value": "barometric",
+          "label": {
+            "en": "Barometric",
+            "fr": "Barométrique"
+          }
+        }
+      ]
+    },
+    {
+      "key": "language",
+      "type": "select",
+      "label": {
+        "en": "Language of the directions",
+        "fr": "Langue des directions"
+      },
+      "description": {
+        "en": "Where to look in the scenes and the scene action: N, NE, E... (English: W for west).",
+        "fr": "Où regarder dans les scènes et l'action de scène : N, NE, E... (français : O pour ouest)."
+      },
+      "required": false,
+      "default": "fr",
+      "options": [
+        {
+          "value": "fr",
+          "label": {
+            "en": "French",
+            "fr": "Français"
+          }
+        },
+        {
+          "value": "en",
+          "label": {
+            "en": "English",
+            "fr": "Anglais"
+          }
+        }
+      ]
+    },
+    {
+      "key": "receiver",
+      "type": "section",
+      "label": {
+        "en": "Your ADS-B receiver",
+        "fr": "Votre récepteur ADS-B"
+      },
+      "description": {
+        "en": "Only with the source \"My ADS-B receiver\". The address of the map page of tar1090 or dump1090-fa (…/data/aircraft.json is added), or of the aircraft.json file itself. A private address is fine: the file is read on your network, and the distance to each house is computed in Gladys. A user name and password, when the page asks for one, go in the address: http://user:password@192.168.1.30/tar1090/.",
+        "fr": "Seulement avec la source « Mon récepteur ADS-B ». L'adresse de la page de carte de tar1090 ou dump1090-fa (…/data/aircraft.json est ajouté), ou du fichier aircraft.json lui-même. Une adresse privée convient : le fichier est lu sur votre réseau, et la distance à chaque maison est calculée dans Gladys. Un nom d'utilisateur et un mot de passe, quand la page en demande, vont dans l'adresse : http://utilisateur:motdepasse@192.168.1.30/tar1090/."
+      },
+      "links": [
+        {
+          "url": "https://github.com/wiedehopf/readsb/blob/dev/README-json.md",
+          "label": {
+            "en": "readsb: the aircraft.json format",
+            "fr": "readsb : le format d'aircraft.json"
+          }
+        }
+      ]
+    },
+    {
+      "key": "receiver_url",
+      "type": "string",
+      "label": {
+        "en": "Address of the receiver",
+        "fr": "Adresse du récepteur"
+      },
+      "required": false,
+      "placeholder": {
+        "en": "http://192.168.1.30/tar1090/",
+        "fr": "http://192.168.1.30/tar1090/"
+      }
+    },
+    {
+      "key": "account",
+      "type": "section",
+      "label": {
+        "en": "OpenSky Network (with its written agreement only)",
+        "fr": "OpenSky Network (avec son accord écrit seulement)"
+      },
+      "description": {
+        "en": "Only with the source \"OpenSky Network\", and only if OpenSky granted you a written agreement: its terms reserve the REST API for non-profit research and education and require one for any operational use in a live product or automated system, Gladys included. Anonymously, 400 credits a day per internet address (about one reading every 7 minutes for one house). With an API client (opensky-network.org, Account page: create an API client, copy its id and secret below), 4,000 a day, down to one reading a minute. The secret is only sent to OpenSky's sign-in server.",
+        "fr": "Seulement avec la source « OpenSky Network », et seulement si OpenSky vous a accordé un accord écrit : ses conditions réservent l'API REST à la recherche et à l'enseignement non lucratifs et en exigent un pour tout usage opérationnel dans un produit en service ou un système automatisé, Gladys compris. En anonyme, 400 crédits par jour et par adresse internet (environ une lecture toutes les 7 minutes pour une maison). Avec un client API (opensky-network.org, page Account : créez un client API, copiez son identifiant et son secret ci-dessous), 4 000 par jour, jusqu'à une lecture par minute. Le secret n'est envoyé qu'au serveur de connexion d'OpenSky."
+      },
+      "links": [
+        {
+          "url": "https://opensky-network.org/about/terms-of-use",
+          "label": {
+            "en": "OpenSky terms of use",
+            "fr": "Conditions d'utilisation d'OpenSky"
+          }
+        },
+        {
+          "url": "https://openskynetwork.github.io/opensky-api/rest.html#authentication",
+          "label": {
+            "en": "OpenSky API: authentication",
+            "fr": "API OpenSky : authentification"
+          }
+        }
+      ]
+    },
+    {
+      "key": "client_id",
+      "type": "string",
+      "label": {
+        "en": "API client id",
+        "fr": "Identifiant du client API"
+      },
+      "required": false,
+      "placeholder": {
+        "en": "me-api-client",
+        "fr": "moi-api-client"
+      }
+    },
+    {
+      "key": "client_secret",
+      "type": "secret",
+      "label": {
+        "en": "API client secret",
+        "fr": "Secret du client API"
+      },
+      "required": false
+    },
+    {
+      "key": "pace",
+      "type": "section",
+      "label": {
+        "en": "Pace and active hours",
+        "fr": "Rythme et heures actives"
+      },
+      "description": {
+        "en": "By default: a reading every 30 s per house with adsb.lol or adsb.fi (their requests at least 1.1 s apart), every 10 s with your receiver (one read for every house), and with OpenSky the interval its daily credits allow (a minute at least). A longer interval can be typed below. Outside the active hours (the time of Gladys) nothing is read.",
+        "fr": "Par défaut : une lecture toutes les 30 s par maison avec adsb.lol ou adsb.fi (leurs requêtes espacées d'au moins 1,1 s), toutes les 10 s avec votre récepteur (une lecture pour toutes les maisons), et avec OpenSky l'intervalle que permettent ses crédits du jour (une minute au moins). Un intervalle plus long peut être saisi ci-dessous. Hors des heures actives (l'heure de Gladys), rien n'est lu."
+      }
+    },
+    {
+      "key": "poll_seconds",
+      "type": "number",
+      "label": {
+        "en": "Interval between two readings (s, 0 = automatic)",
+        "fr": "Intervalle entre deux lectures (s, 0 = automatique)"
+      },
+      "description": {
+        "en": "A shorter interval than the source allows is raised to its minimum: 15 s for adsb.lol and adsb.fi, 5 s for a receiver, the credits for OpenSky.",
+        "fr": "Un intervalle plus court que la source ne le permet est relevé à son minimum : 15 s pour adsb.lol et adsb.fi, 5 s pour un récepteur, les crédits pour OpenSky."
+      },
+      "required": false,
+      "default": 0,
+      "min": 0,
+      "max": 3600
+    },
+    {
+      "key": "active_from",
+      "type": "number",
+      "label": {
+        "en": "Active from (hour, 0-23)",
+        "fr": "Actif à partir de (heure, 0-23)"
+      },
+      "required": false,
+      "default": 0,
+      "min": 0,
+      "max": 23
+    },
+    {
+      "key": "active_to",
+      "type": "number",
+      "label": {
+        "en": "Active until (hour, 1-24)",
+        "fr": "Actif jusqu'à (heure, 1-24)"
+      },
+      "description": {
+        "en": "0 to 24: all day. Before the start hour (e.g. 22 to 6): through the night.",
+        "fr": "0 à 24 : toute la journée. Avant l'heure de début (ex. 22 à 6) : à cheval sur la nuit."
+      },
+      "required": false,
+      "default": 24,
+      "min": 1,
+      "max": 24
+    }
+  ],
+  "actions": [
+    {
+      "key": "test_connection",
+      "timeout_seconds": 30,
+      "label": {
+        "en": "Test the source",
+        "fr": "Tester la source"
+      },
+      "description": {
+        "en": "Reads the sky over the first house now and shows the pace (OpenSky: one credit, and the credits left).",
+        "fr": "Lit le ciel de la première maison maintenant et affiche le rythme (OpenSky : un crédit, et les crédits restants)."
+      }
+    }
+  ],
+  "widgets": [
+    {
+      "key": "sky",
+      "label": {
+        "en": "Aircraft overhead",
+        "fr": "Avions au-dessus"
+      },
+      "description": {
+        "en": "The aircraft around a house: count, the closest ones, where to look, altitude, speed and heading.",
+        "fr": "Les avions autour d'une maison : nombre, les plus proches, où regarder, altitude, vitesse et cap."
+      },
+      "icon": "navigation",
+      "settings": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "required": true,
+          "label": {
+            "en": "House",
+            "fr": "Maison"
+          }
+        }
+      ]
+    }
+  ],
+  "scene_triggers": [
+    {
+      "key": "aircraft_overhead",
+      "label": {
+        "en": "Aircraft overhead",
+        "fr": "Avion au-dessus"
+      },
+      "description": {
+        "en": "An aircraft is, or will be within the minute, closer than the distance and below the altitude. Once per aircraft and passage. Beyond the radius of the configuration, the radius applies.",
+        "fr": "Un avion est, ou sera dans la minute, plus proche que la distance et sous l'altitude. Une fois par avion et par passage. Au-delà du rayon de la configuration, c'est le rayon qui compte."
+      },
+      "fields": [
+        {
+          "key": "house",
+          "type": "select",
+          "source": "devices",
+          "required": true,
+          "label": {
+            "en": "House",
+            "fr": "Maison"
+          }
+        },
+        {
+          "key": "max_distance",
+          "type": "select",
+          "required": true,
+          "label": {
+            "en": "Within",
+            "fr": "À moins de"
+          },
+          "options": [
+            {
+              "value": "1",
+              "label": {
+                "en": "1 km",
+                "fr": "1 km"
+              }
+            },
+            {
+              "value": "2",
+              "label": {
+                "en": "2 km",
+                "fr": "2 km"
+              }
+            },
+            {
+              "value": "3",
+              "label": {
+                "en": "3 km",
+                "fr": "3 km"
+              }
+            },
+            {
+              "value": "5",
+              "label": {
+                "en": "5 km",
+                "fr": "5 km"
+              }
+            },
+            {
+              "value": "10",
+              "label": {
+                "en": "10 km",
+                "fr": "10 km"
+              }
+            },
+            {
+              "value": "25",
+              "label": {
+                "en": "25 km",
+                "fr": "25 km"
+              }
+            }
+          ]
+        },
+        {
+          "key": "max_altitude",
+          "type": "select",
+          "required": true,
+          "label": {
+            "en": "Below",
+            "fr": "Sous"
+          },
+          "options": [
+            {
+              "value": "500",
+              "label": {
+                "en": "500 m",
+                "fr": "500 m"
+              }
+            },
+            {
+              "value": "1000",
+              "label": {
+                "en": "1,000 m",
+                "fr": "1 000 m"
+              }
+            },
+            {
+              "value": "2000",
+              "label": {
+                "en": "2,000 m",
+                "fr": "2 000 m"
+              }
+            },
+            {
+              "value": "3000",
+              "label": {
+                "en": "3,000 m",
+                "fr": "3 000 m"
+              }
+            },
+            {
+              "value": "5000",
+              "label": {
+                "en": "5,000 m",
+                "fr": "5 000 m"
+              }
+            },
+            {
+              "value": "10000",
+              "label": {
+                "en": "10,000 m",
+                "fr": "10 000 m"
+              }
+            },
+            {
+              "value": "any",
+              "label": {
+                "en": "Any altitude",
+                "fr": "Toute altitude"
+              }
+            }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "key": "callsign",
+          "type": "string",
+          "label": {
+            "en": "Flight (callsign, else transponder address)",
+            "fr": "Vol (indicatif, sinon adresse du transpondeur)"
+          }
+        },
+        {
+          "key": "icao24",
+          "type": "string",
+          "label": {
+            "en": "Transponder address (icao24)",
+            "fr": "Adresse du transpondeur (icao24)"
+          }
+        },
+        {
+          "key": "registration",
+          "type": "string",
+          "label": {
+            "en": "Registration (adsb.lol, adsb.fi, a receiver with a database)",
+            "fr": "Immatriculation (adsb.lol, adsb.fi, un récepteur avec une base)"
+          }
+        },
+        {
+          "key": "aircraft_type",
+          "type": "string",
+          "label": {
+            "en": "Aircraft type (ICAO code, e.g. A320)",
+            "fr": "Type d'avion (code OACI, ex. A320)"
+          }
+        },
+        {
+          "key": "country",
+          "type": "string",
+          "label": {
+            "en": "Country of registration (OpenSky only)",
+            "fr": "Pays d'immatriculation (OpenSky seulement)"
+          }
+        },
+        {
+          "key": "distance",
+          "type": "number",
+          "label": {
+            "en": "Closest distance (km)",
+            "fr": "Distance la plus proche (km)"
+          }
+        },
+        {
+          "key": "altitude",
+          "type": "number",
+          "label": {
+            "en": "Altitude (m)",
+            "fr": "Altitude (m)"
+          }
+        },
+        {
+          "key": "eta_seconds",
+          "type": "number",
+          "label": {
+            "en": "Seconds before the closest point (0: now)",
+            "fr": "Secondes avant le point le plus proche (0 : maintenant)"
+          }
+        },
+        {
+          "key": "speed",
+          "type": "number",
+          "label": {
+            "en": "Speed (km/h)",
+            "fr": "Vitesse (km/h)"
+          }
+        },
+        {
+          "key": "heading",
+          "type": "number",
+          "label": {
+            "en": "Heading (degrees)",
+            "fr": "Cap (degrés)"
+          }
+        },
+        {
+          "key": "vertical_rate",
+          "type": "number",
+          "label": {
+            "en": "Vertical rate (m/s)",
+            "fr": "Taux de montée (m/s)"
+          }
+        },
+        {
+          "key": "bearing",
+          "type": "number",
+          "label": {
+            "en": "Where to look (degrees from north)",
+            "fr": "Où regarder (degrés depuis le nord)"
+          }
+        },
+        {
+          "key": "direction",
+          "type": "string",
+          "label": {
+            "en": "Where to look (N, NE...)",
+            "fr": "Où regarder (N, NE...)"
+          }
+        },
+        {
+          "key": "squawk",
+          "type": "string",
+          "label": {
+            "en": "Transponder code (squawk)",
+            "fr": "Code transpondeur (squawk)"
+          }
+        }
+      ]
+    },
+    {
+      "key": "emergency_squawk",
+      "label": {
+        "en": "Aircraft emergency code",
+        "fr": "Code d'urgence d'un avion"
+      },
+      "description": {
+        "en": "An aircraft within the radius transmits 7500 (unlawful interference), 7600 (radio failure) or 7700 (emergency). Once per aircraft, code and passage.",
+        "fr": "Un avion dans le rayon émet 7500 (intervention illicite), 7600 (panne radio) ou 7700 (urgence). Une fois par avion, code et passage."
+      },
+      "fields": [
+        {
+          "key": "house",
+          "type": "select",
+          "source": "devices",
+          "required": true,
+          "label": {
+            "en": "House",
+            "fr": "Maison"
+          }
+        },
+        {
+          "key": "squawk",
+          "type": "select",
+          "required": false,
+          "label": {
+            "en": "Code (empty: any)",
+            "fr": "Code (vide : tous)"
+          },
+          "options": [
+            {
+              "value": "7500",
+              "label": {
+                "en": "7500 unlawful interference",
+                "fr": "7500 intervention illicite"
+              }
+            },
+            {
+              "value": "7600",
+              "label": {
+                "en": "7600 radio failure",
+                "fr": "7600 panne radio"
+              }
+            },
+            {
+              "value": "7700",
+              "label": {
+                "en": "7700 emergency",
+                "fr": "7700 urgence"
+              }
+            }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "key": "emergency",
+          "type": "string",
+          "label": {
+            "en": "Meaning of the code",
+            "fr": "Signification du code"
+          }
+        },
+        {
+          "key": "callsign",
+          "type": "string",
+          "label": {
+            "en": "Flight (callsign, else transponder address)",
+            "fr": "Vol (indicatif, sinon adresse du transpondeur)"
+          }
+        },
+        {
+          "key": "icao24",
+          "type": "string",
+          "label": {
+            "en": "Transponder address (icao24)",
+            "fr": "Adresse du transpondeur (icao24)"
+          }
+        },
+        {
+          "key": "registration",
+          "type": "string",
+          "label": {
+            "en": "Registration (adsb.lol, adsb.fi, a receiver with a database)",
+            "fr": "Immatriculation (adsb.lol, adsb.fi, un récepteur avec une base)"
+          }
+        },
+        {
+          "key": "aircraft_type",
+          "type": "string",
+          "label": {
+            "en": "Aircraft type (ICAO code, e.g. A320)",
+            "fr": "Type d'avion (code OACI, ex. A320)"
+          }
+        },
+        {
+          "key": "country",
+          "type": "string",
+          "label": {
+            "en": "Country of registration (OpenSky only)",
+            "fr": "Pays d'immatriculation (OpenSky seulement)"
+          }
+        },
+        {
+          "key": "distance",
+          "type": "number",
+          "label": {
+            "en": "Distance (km)",
+            "fr": "Distance (km)"
+          }
+        },
+        {
+          "key": "altitude",
+          "type": "number",
+          "label": {
+            "en": "Altitude (m)",
+            "fr": "Altitude (m)"
+          }
+        },
+        {
+          "key": "speed",
+          "type": "number",
+          "label": {
+            "en": "Speed (km/h)",
+            "fr": "Vitesse (km/h)"
+          }
+        },
+        {
+          "key": "heading",
+          "type": "number",
+          "label": {
+            "en": "Heading (degrees)",
+            "fr": "Cap (degrés)"
+          }
+        },
+        {
+          "key": "direction",
+          "type": "string",
+          "label": {
+            "en": "Where to look (N, NE...)",
+            "fr": "Où regarder (N, NE...)"
+          }
+        }
+      ]
+    }
+  ],
+  "scene_actions": [
+    {
+      "key": "get_aircraft",
+      "label": {
+        "en": "Aircraft over a house",
+        "fr": "Avions au-dessus d'une maison"
+      },
+      "description": {
+        "en": "The aircraft around a house right now and the closest one, for a message or a condition that follows. A reading under a minute old is reused.",
+        "fr": "Les avions autour d'une maison en ce moment et le plus proche, pour un message ou une condition qui suit. Une lecture de moins d'une minute est réutilisée."
+      },
+      "timeout_seconds": 30,
+      "fields": [
+        {
+          "key": "house",
+          "type": "select",
+          "source": "devices",
+          "required": true,
+          "label": {
+            "en": "House",
+            "fr": "Maison"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "key": "count",
+          "type": "number",
+          "label": {
+            "en": "Aircraft within the radius",
+            "fr": "Avions dans le rayon"
+          }
+        },
+        {
+          "key": "list",
+          "type": "string",
+          "label": {
+            "en": "Aircraft, one per line",
+            "fr": "Avions, un par ligne"
+          }
+        },
+        {
+          "key": "closest_callsign",
+          "type": "string",
+          "label": {
+            "en": "Closest flight",
+            "fr": "Vol le plus proche"
+          }
+        },
+        {
+          "key": "closest_icao24",
+          "type": "string",
+          "label": {
+            "en": "Transponder address of the closest",
+            "fr": "Adresse du transpondeur du plus proche"
+          }
+        },
+        {
+          "key": "closest_registration",
+          "type": "string",
+          "label": {
+            "en": "Registration of the closest",
+            "fr": "Immatriculation du plus proche"
+          }
+        },
+        {
+          "key": "closest_type",
+          "type": "string",
+          "label": {
+            "en": "Aircraft type of the closest (e.g. A320)",
+            "fr": "Type d'avion du plus proche (ex. A320)"
+          }
+        },
+        {
+          "key": "closest_country",
+          "type": "string",
+          "label": {
+            "en": "Country of the closest (OpenSky only)",
+            "fr": "Pays du plus proche (OpenSky seulement)"
+          }
+        },
+        {
+          "key": "closest_distance",
+          "type": "number",
+          "label": {
+            "en": "Distance of the closest (km)",
+            "fr": "Distance du plus proche (km)"
+          }
+        },
+        {
+          "key": "closest_altitude",
+          "type": "number",
+          "label": {
+            "en": "Altitude of the closest (m)",
+            "fr": "Altitude du plus proche (m)"
+          }
+        },
+        {
+          "key": "closest_speed",
+          "type": "number",
+          "label": {
+            "en": "Speed of the closest (km/h)",
+            "fr": "Vitesse du plus proche (km/h)"
+          }
+        },
+        {
+          "key": "closest_heading",
+          "type": "number",
+          "label": {
+            "en": "Heading of the closest (degrees)",
+            "fr": "Cap du plus proche (degrés)"
+          }
+        },
+        {
+          "key": "closest_bearing",
+          "type": "number",
+          "label": {
+            "en": "Where to look for the closest (degrees)",
+            "fr": "Où regarder le plus proche (degrés)"
+          }
+        },
+        {
+          "key": "closest_direction",
+          "type": "string",
+          "label": {
+            "en": "Where to look for the closest (N, NE...)",
+            "fr": "Où regarder le plus proche (N, NE...)"
+          }
+        },
+        {
+          "key": "emergency",
+          "type": "boolean",
+          "label": {
+            "en": "An emergency code within the radius",
+            "fr": "Un code d'urgence dans le rayon"
+          }
+        },
+        {
+          "key": "age_seconds",
+          "type": "number",
+          "label": {
+            "en": "Age of the reading (s)",
+            "fr": "Âge de la lecture (s)"
+          }
+        }
+      ]
+    }
+  ]
+}
