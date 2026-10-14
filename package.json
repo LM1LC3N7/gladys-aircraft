@@ -1,6 +1,6 @@
 {
   "name": "gladys-aircraft",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Gladys Assistant external integration for aircraft flying over your home (adsb.lol, adsb.fi, your own ADS-B receiver or OpenSky): closest flight, altitude and heading, an \"aircraft overhead\" scene trigger and a dashboard widget. Unofficial.",
   "type": "module",

@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-14
+
 ### Added
 
 - One device per located house ("Aircraft over _house_"): the aircraft
@@ -35,3 +37,6 @@ the notes of the version's GitHub Release.
   where to look, altitude, speed and heading, or "clear sky", with the
   credit of the source in use.
 - "Test the source" button: one reading and the pace.
+
+[Unreleased]: https://github.com/LM1LC3N7/gladys-aircraft/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/LM1LC3N7/gladys-aircraft/releases/tag/v0.1.1
