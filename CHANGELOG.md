@@ -10,6 +10,12 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+### Fixed
+
+- Docs: the scene variables are written as Gladys reads them,
+  `{{triggerEvent.data.<key>}}`, and the action outputs come from the variable
+  list.
+
 ## [0.1.1] - 2026-10-14
 
 ### Added

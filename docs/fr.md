@@ -99,28 +99,35 @@ passages.
   l'altitude (500 m à 10 000 m, ou toute altitude). La scène se lance une
   fois par avion et par passage quand un avion est, ou sera dans la minute,
   aussi proche et aussi bas ; un avion revu dans les 10 minutes reste le
-  même passage. `{{eta_seconds}}` donne le nombre de secondes avant le point
-  le plus proche (0 : maintenant). Au-delà du rayon de la configuration,
-  c'est le rayon qui compte. Variables : le vol `{{callsign}}` (l'adresse
-  du transpondeur quand aucun indicatif n'est reçu), `{{icao24}}`,
-  `{{registration}}` et `{{aircraft_type}}` (adsb.lol, adsb.fi, un
-  récepteur avec sa base), `{{country}}` (OpenSky seulement), `{{distance}}`
-  (km), `{{altitude}}` (m), `{{speed}}` (km/h), `{{heading}}`,
-  `{{vertical_rate}}`, où regarder `{{direction}}` et `{{bearing}}`,
-  `{{squawk}}`.
+  même passage. `{{triggerEvent.data.eta_seconds}}` donne le nombre de
+  secondes avant le point le plus proche (0 : maintenant). Au-delà du rayon
+  de la configuration, c'est le rayon qui compte. Variables : le vol
+  `{{triggerEvent.data.callsign}}` (l'adresse du transpondeur quand aucun
+  indicatif n'est reçu), `{{triggerEvent.data.icao24}}`,
+  `{{triggerEvent.data.registration}}` et
+  `{{triggerEvent.data.aircraft_type}}` (adsb.lol, adsb.fi, un récepteur
+  avec sa base), `{{triggerEvent.data.country}}` (OpenSky seulement),
+  `{{triggerEvent.data.distance}}` (km), `{{triggerEvent.data.altitude}}`
+  (m), `{{triggerEvent.data.speed}}` (km/h),
+  `{{triggerEvent.data.heading}}`, `{{triggerEvent.data.vertical_rate}}`,
+  où regarder `{{triggerEvent.data.direction}}` et
+  `{{triggerEvent.data.bearing}}`, `{{triggerEvent.data.squawk}}`.
 - **Code d'urgence d'un avion** : un avion dans le rayon émet 7500
   (intervention illicite), 7600 (panne radio) ou 7700 (urgence) ; une fois
-  par avion, code et passage. `{{emergency}}` dit ce que signifie le code.
+  par avion, code et passage. `{{triggerEvent.data.emergency}}` dit ce que
+  signifie le code.
 - La première lecture après un démarrage n'annonce rien : elle note
   seulement ce qui est déjà dans le ciel. Changer de source n'annonce pas à
   nouveau les avions déjà vus.
 
-L'action **Avions au-dessus d'une maison** donne `{{count}}`, `{{list}}` (un
-avion par ligne) et le plus proche : `{{closest_callsign}}`,
-`{{closest_registration}}`, `{{closest_type}}`, `{{closest_distance}}`,
-`{{closest_altitude}}`, `{{closest_speed}}`, `{{closest_direction}}`... Une
-lecture récente (dans l'intervalle, une minute au plus) est réutilisée ; une
-action ne lance jamais de déclencheur.
+L'action **Avions au-dessus d'une maison** donne `count`, `list` (un avion
+par ligne) et le plus proche : `closest_callsign`, `closest_registration`,
+`closest_type`, `closest_distance`, `closest_altitude`, `closest_speed`,
+`closest_direction`... Les actions suivantes de la scène les trouvent dans
+leur liste de variables (écrites `{{<étape>.<action>.<clé>}}`, par exemple
+`{{0.0.count}}` quand cette action est la première de la scène). Une lecture
+récente (dans l'intervalle, une minute au plus) est réutilisée ; une action
+ne lance jamais de déclencheur.
 
 ## Bon à savoir
 

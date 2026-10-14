@@ -94,28 +94,34 @@ seconds sees almost every passage.
   altitude (500 m to 10,000 m, or any altitude). The scene runs once per
   aircraft and passage when an aircraft is, or will be within the minute,
   that close and that low; an aircraft seen again within 10 minutes is the
-  same passage. `{{eta_seconds}}` tells how many seconds before it is
-  closest (0: now). Beyond the radius of the configuration, the radius
-  applies. Variables: the flight `{{callsign}}` (the transponder address
-  when no callsign is received), `{{icao24}}`, `{{registration}}` and
-  `{{aircraft_type}}` (adsb.lol, adsb.fi, a receiver with its database),
-  `{{country}}` (OpenSky only), `{{distance}}` (km), `{{altitude}}` (m),
-  `{{speed}}` (km/h), `{{heading}}`, `{{vertical_rate}}`, where to look
-  `{{direction}}` and `{{bearing}}`, `{{squawk}}`.
+  same passage. `{{triggerEvent.data.eta_seconds}}` tells how many seconds
+  before it is closest (0: now). Beyond the radius of the configuration, the
+  radius applies. Variables: the flight `{{triggerEvent.data.callsign}}`
+  (the transponder address when no callsign is received),
+  `{{triggerEvent.data.icao24}}`, `{{triggerEvent.data.registration}}` and
+  `{{triggerEvent.data.aircraft_type}}` (adsb.lol, adsb.fi, a receiver with
+  its database), `{{triggerEvent.data.country}}` (OpenSky only),
+  `{{triggerEvent.data.distance}}` (km), `{{triggerEvent.data.altitude}}`
+  (m), `{{triggerEvent.data.speed}}` (km/h),
+  `{{triggerEvent.data.heading}}`, `{{triggerEvent.data.vertical_rate}}`,
+  where to look `{{triggerEvent.data.direction}}` and
+  `{{triggerEvent.data.bearing}}`, `{{triggerEvent.data.squawk}}`.
 - **Aircraft emergency code**: an aircraft within the radius transmits
   7500 (unlawful interference), 7600 (radio failure) or 7700 (emergency);
-  once per aircraft, code and passage. `{{emergency}}` says what the code
-  means.
+  once per aircraft, code and passage. `{{triggerEvent.data.emergency}}`
+  says what the code means.
 - The first reading after a start announces nothing: it only records what
   is already in the sky. Changing the source does not announce the aircraft
   already seen again.
 
-The action **Aircraft over a house** gives `{{count}}`, `{{list}}` (one line
-per aircraft) and the closest one: `{{closest_callsign}}`,
-`{{closest_registration}}`, `{{closest_type}}`, `{{closest_distance}}`,
-`{{closest_altitude}}`, `{{closest_speed}}`, `{{closest_direction}}`... A
-recent reading (within the interval, a minute at most) is reused; an action
-never fires a trigger.
+The action **Aircraft over a house** gives `count`, `list` (one line per
+aircraft) and the closest one: `closest_callsign`, `closest_registration`,
+`closest_type`, `closest_distance`, `closest_altitude`, `closest_speed`,
+`closest_direction`... The following actions of the scene find them in their
+variable list (written `{{<step>.<action>.<key>}}`, for instance
+`{{0.0.count}}` when this action is the first of the scene). A recent reading
+(within the interval, a minute at most) is reused; an action never fires a
+trigger.
 
 ## Good to know
 
