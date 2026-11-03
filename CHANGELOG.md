@@ -10,6 +10,10 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+### Changed
+
+- Integration SDK 0.16 (no change for the devices).
+
 ### Fixed
 
 - Docs: the scene variables are written as Gladys reads them,

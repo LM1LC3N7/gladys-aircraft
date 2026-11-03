@@ -43,6 +43,13 @@
       the device widget (negative values near the ground).
 - [ ] The TZ variable reaches the container (the active hours are local).
 
+## Decisions
+
+- **SDK `^0.16.0`** (2026-11-03, migration wave 5): it adds the ai, tts and
+  music types; no effect here (`poll_frequency` unused, the integration reads
+  at its own pace). `keywords`, `countries` and `gladys_version >= 5.3.0`
+  wait until Gladys 5.3 is widespread.
+
 ## Ideas
 
 - The country of registration with the readsb sources, from the ICAO

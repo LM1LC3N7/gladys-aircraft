@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "node --test",
+    "test": "node --test --test-timeout=60000",
     "audit": "npm audit --omit=dev"
   },
   "engines": {
@@ -21,7 +21,7 @@
     "url": "git+https://github.com/LM1LC3N7/gladys-aircraft.git"
   },
   "dependencies": {
-    "@gladysassistant/integration-sdk": "^0.15.0"
+    "@gladysassistant/integration-sdk": "^0.16.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
