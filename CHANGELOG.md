@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-11-03
+
 ### Changed
 
 - Integration SDK 0.16 (no change for the devices).
@@ -48,5 +50,6 @@ the notes of the version's GitHub Release.
   credit of the source in use.
 - "Test the source" button: one reading and the pace.
 
-[Unreleased]: https://github.com/LM1LC3N7/gladys-aircraft/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/LM1LC3N7/gladys-aircraft/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/LM1LC3N7/gladys-aircraft/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/LM1LC3N7/gladys-aircraft/releases/tag/v0.1.1
