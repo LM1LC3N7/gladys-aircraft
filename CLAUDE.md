@@ -7,7 +7,7 @@ human contributors.
 
 A Gladys Assistant **external integration** of type `device`: a Node.js
 service (Node 22+, ESM, no build step) in its own sandboxed Docker container,
-talking to Gladys through `@gladysassistant/integration-sdk` (v0.15). It
+talking to Gladys through `@gladysassistant/integration-sdk` (v0.16). It
 turns the aircraft around each located house into a device, scene triggers
 ("aircraft overhead", "aircraft emergency code"), a scene action and a "sky"
 widget. The aircraft come from one `source` of the configuration:
